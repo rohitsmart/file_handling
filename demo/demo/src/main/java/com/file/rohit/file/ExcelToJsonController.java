@@ -15,32 +15,24 @@ public class ExcelToJsonController {
     public Map<String, Object> convertExcelToJson(@RequestParam("file") MultipartFile file) {
         Map<String, Object> result = new HashMap<>();
         List<Map<String, Object>> dataList = new ArrayList<>();
-
         try {
-            // Load the Excel file
             InputStream inputStream = file.getInputStream();
             Workbook workbook = new XSSFWorkbook(inputStream);
-            Sheet sheet = workbook.getSheetAt(0);  // Assuming we are working with the first sheet
-
-            // Get headers
-            Row headerRow = sheet.getRow(0);  // First row as headers
+            Sheet sheet = workbook.getSheetAt(0);
+            Row headerRow = sheet.getRow(0);
             if (headerRow == null) {
                 result.put("error", "No header row found in the Excel file.");
                 return result;
             }
-
             List<String> headers = new ArrayList<>();
             for (Cell headerCell : headerRow) {
                 headers.add(headerCell.getStringCellValue());
             }
-
-            // Iterate through each row and convert it to a map
             for (int i = 1; i <= sheet.getLastRowNum(); i++) {
                 Row row = sheet.getRow(i);
                 if (row == null) {
-                    continue;  // Skip empty rows
+                    continue;
                 }
-
                 Map<String, Object> dataMap = new HashMap<>();
                 for (int j = 0; j < headers.size(); j++) {
                     Cell cell = row.getCell(j);
@@ -69,7 +61,6 @@ public class ExcelToJsonController {
                 }
                 dataList.add(dataMap);
             }
-
             workbook.close();
             result.put("data", dataList);
             return result;
